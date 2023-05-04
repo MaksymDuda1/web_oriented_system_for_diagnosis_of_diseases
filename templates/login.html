@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{%block contents%}
+<H1><a href="{{ url_for('main_page') }}" class="main-btn">Medilife</a></H1>
+<div class="container">
+  <div class="form">
+    <form action="" method="POST">
+
+      <div class="form_item">
+        <label for="email">Email</label><br>
+        <input type="email" name="email" id="email" placeholder="Your email" required>
+      </div>
+
+      <div class="form_item">
+        <label for="password">
+          Password
+        </label><br>
+        <input type="password" name="password" id="password" placeholder="Your password" required minlength="8">
+      </div>
+      <div class="btn-container">
+        <input type="submit" value="Sign in" class="btn">
+      </div>
+    </form>
+  </div>
+  <div class="btn-container">
+    <a href="{{ url_for('registration') }}" class="btn">Don't have an account? Register now</a>
+  </div>
+</div>
+{%endblock%}

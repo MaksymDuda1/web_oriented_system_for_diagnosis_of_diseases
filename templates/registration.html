@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{%block contents%}
+<H1><a href="{{ url_for('main_page') }}" class="main-btn">Medilife</a></H1>
+<div class="container">
+  <div class="form">
+    <form action="" method="POST">
+      <div class="form_item">
+        <label for="name">
+          Name
+        </label><br>
+        <input type="text" name="name" id="name" placeholder="Your name" required>
+      </div>
+      <div class="form_item">
+        <label for="email">Email</label><br>
+        <input type="email" name="email" id="email" placeholder="Your email" required
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+      </div>
+      <div class="form_item">
+        <label for="gender">Gender</label><br>
+        <select name="gender" id="gender">
+          <option value="man">man</option>
+          <option value="woman">woman</option>
+        </select>
+      </div>
+      <div class="form_item">
+        <label for="birthday">
+          Your birthday
+        </label><br>
+        <input type="text" name="birthday" id="birthday" placeholder="YYYY-MM-DD" required pattern="\d{4}-\d{2}-\d{2}"
+          title="Please enter a date in the format YYYY-MM-DD">
+      </div>
+      <div class="form-item">
+        <label for="user-photo">
+          Input user image
+        </label><br>
+        <input type="file" class="form-control-file" name="user-photo" id="user-photo">
+      </div>
+      <div class="form_item">
+        <label for="password">
+          Password
+        </label><br>
+        <input type="password" name="password" id="password" placeholder="Your password" required minlength="8">
+      </div>
+      <div class="btn-container">
+        <input type="submit" value="Sign up" class="btn">
+      </div>
+    </form>
+    <div class="btn-container">
+      <a href="{{ url_for('loggining') }}" class="btn">Already have account? Sign in</a>
+    </div>
+  </div>
+</div>
+<script src="../static/js/index.js"></script>
+{%endblock%}
