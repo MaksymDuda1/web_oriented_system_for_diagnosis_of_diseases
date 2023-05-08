@@ -1,4 +1,7 @@
 import mysql.connector
+from  flask import Blueprint
+
+db = Blueprint('db',__name__)
 
 class UseDatabase:
     def __init__(self,config):

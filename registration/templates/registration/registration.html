@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {%block contents%}
-<H1><a href="{{ url_for('main_page') }}" class="main-btn">Medilife</a></H1>
+<H1><a href="{{ url_for('index.main_page') }}" class="main-btn">Medilife</a></H1>
 <div class="container">
   <div class="form">
-    <form action="" method="POST">
+    <form action="" method="POST" enctype='multipart/form-data'>
       <div class="form_item">
         <label for="name">
           Name
@@ -46,7 +46,7 @@
       </div>
     </form>
     <div class="btn-container">
-      <a href="{{ url_for('loggining') }}" class="btn">Already have account? Sign in</a>
+      <a href="{{ url_for('logout.logout_page') }}" class="btn">Already have account? Sign in</a>
     </div>
   </div>
 </div>

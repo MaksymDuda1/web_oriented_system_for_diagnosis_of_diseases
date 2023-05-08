@@ -106,8 +106,9 @@ body {
 }
 
 .user-photo {
-    width: 25px;
-    height: 25px;
+    width: 30x;
+    height: 30px;
+    border-radius: 50%;
 }
 
 .dropdown-button {

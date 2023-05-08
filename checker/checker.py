@@ -1,6 +1,7 @@
-from flask import session
-
+from flask import session,Blueprint
 from functools import wraps
+
+checker = Blueprint('checker',__name__)
 
 def check__logged_in(func):
     @wraps(func)

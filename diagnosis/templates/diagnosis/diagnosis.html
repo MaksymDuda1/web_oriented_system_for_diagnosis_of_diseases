@@ -10,7 +10,7 @@
     <h1>Введіть симптоми</h1>
     <input type="text" name="symptoms" id="symptoms">
     <button onclick="addSymptoms()">Додати</button>
-    <form action="/result" method="POST" name="symptoms-form">
+    <form action="{{url_for('result.show_result')}}" method="POST" name="symptoms-form">
 
         <div name="content" id="content">
         </div>
