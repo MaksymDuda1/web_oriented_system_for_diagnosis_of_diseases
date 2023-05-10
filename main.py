@@ -6,6 +6,9 @@ from diagnosis.diagnosis import diagnosis
 from registration.registration import registration
 from logout.logout import logout
 from index.index import index
+from admin.admin import admin
+
+
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/images/uploads'
@@ -24,6 +27,7 @@ app.register_blueprint(checker)
 app.register_blueprint(diagnosis)
 app.register_blueprint(result)
 app.register_blueprint(logout)
+app.register_blueprint(admin)
 
 
 if __name__ == '__main__':

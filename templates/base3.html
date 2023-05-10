@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Python Flask add edit delete Row Using Jquery Ajax and mysqldb database</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+    <script src="{{ url_for('static', filename='js/admin_panel.js') }}"></script>
+
+
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('index.main_page') }}" class="logo">Medical</a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index.main_page') }}">Головна</a></li>
+            <li><a href="#">Про нас</a></li>
+            <li><a href="#">Контакти</a></li>
+            <li><a href="{{ url_for('diagnosis.diagnosis_page') }}">Дізнатись хворобу</a></li>
+        </ul>
+
+
+        <div class="dropdown dropdown-button dropdown-hover">
+            <a class="btn btn-primary dropdown-toggle dropdown-button" type="button" id="dropdownMenuLink"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img class="user-photo"
+                    src="{{ session.get('filepath') or url_for('static', filename='images/user.png') }}" alt="">
+            </a>
+
+            <div class="dropdown-menu ass" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <a href="{{ url_for('logout.logout_page') }}"><button class="logout-button">Вийти</button></a>
+            </div>
+        </div>
+        <div>
+
+    </nav>
+
+    {% block contents %}
+    {% endblock %}
+
+</body>
+
+</html>
