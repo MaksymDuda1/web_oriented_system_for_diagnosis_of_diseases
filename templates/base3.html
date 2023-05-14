@@ -28,8 +28,7 @@
         <div class="dropdown dropdown-button dropdown-hover">
             <a class="btn btn-primary dropdown-toggle dropdown-button" type="button" id="dropdownMenuLink"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img class="user-photo"
-                    src="{{ session.get('filepath') or url_for('static', filename='images/user.png') }}" alt="">
+                <img class="user-photo" src="{{ url_for('static', filename='images/user.png') }}" alt="">
             </a>
 
             <div class="dropdown-menu ass" aria-labelledby="dropdownMenuButton">

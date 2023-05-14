@@ -72,19 +72,7 @@ $(document).on("click", ".save", function () {
 
 });
 // Delete row on delete button click
-$(document).on("click", ".delete", function () {
-    var row = $(this).closest("tr");
-    var email = row.find("a.delete").attr("id");
-    $.post('/delete', { email: email }, function (data) {
-        $("#displaymessage").html(data);
-        $("#displaymessage").show();
-    });
 
-    // Видалення рядка з бази даних або іншої операції, що ви маєте виконати
-    // Ви можете використовувати змінну "id" для ідентифікації рядка, який потрібно видалити
-
-    row.remove();
-});
 
 
 $(document).on("click", ".delete", function () {

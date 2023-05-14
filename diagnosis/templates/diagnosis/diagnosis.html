@@ -2,14 +2,14 @@
 {% block contents %}
 
 <div class="container">
-    <h1>Сторінка діагнозування</h1>
+    <h1>Сторінка діагностування</h1>
     <div class="text">
         <p>Тут ви можете дізнатись вашу потенційну хворобу</p>
     </div>
 
     <h1>Введіть симптоми</h1>
     <input type="text" name="symptoms" id="symptoms">
-    <button onclick="addSymptoms()">Додати</button>
+    <button type="button" onclick="addSymptoms()">Додати</button>
     <form action="{{url_for('result.show_result')}}" method="POST" name="symptoms-form">
 
         <div name="content" id="content">

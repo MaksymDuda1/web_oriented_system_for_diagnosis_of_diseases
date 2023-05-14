@@ -1,4 +1,32 @@
 {%extends 'base2.html'%}
 {%block contents%}
-{{the_result}}
+<div class="conteiner">
+    <div class="page-name">
+        <H1>Результат</H1>
+    </div>
+    <div class="result">
+        <div class="main-word">Ваша хвороба:</div>
+        <div class="result-item">
+            <h2>{{the_result}}</h2>
+        </div>
+    </div>
+    <div class="description">
+        <div class="main-word">
+            <h3 class="main-word">Опис</h3>
+        </div>
+        text
+    </div>
+    <div class="disease-photo">
+        <img src="#" alt="disease-photo">
+    </div>
+    <div class="treatment">
+        <div class="main-word">Лікування</div>
+        <div class="treatment-item">
+
+            Якесь лікування
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

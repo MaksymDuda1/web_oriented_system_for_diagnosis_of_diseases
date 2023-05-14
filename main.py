@@ -7,6 +7,7 @@ from registration.registration import registration
 from logout.logout import logout
 from index.index import index
 from admin.admin import admin
+from user_account.user_account import user_account
 
 
 
@@ -28,6 +29,7 @@ app.register_blueprint(diagnosis)
 app.register_blueprint(result)
 app.register_blueprint(logout)
 app.register_blueprint(admin)
+app.register_blueprint(user_account)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,144 @@
+{% extends "base2.html" %}
+
+{% block contents %}
+<div class="user-profile">
+    <img class="user-profile-photo"
+        src="{{ session.get('filepath') or url_for('static', filename='images/user.png') }}">
+    <h1 class="user-name">{{ user.name }}</h1>
+    <div class="user-info-row">
+        <label class="user-info-label">Email:</label>
+        <p class="user-info">{{ user.email }}</p>
+    </div>
+    <div class="user-info-row">
+        <label class="user-info-label">Birthday:</label>
+        <p class="user-info">{{ user.birthday }}</p>
+    </div>
+    <div class="user-info-row">
+        <label class="user-info-label">Gender:</label>
+        <p class="user-info">{{ ''.join(user.gender) }}</p>
+    </div>
+    <div class="user-info-row">
+        <label class="user-info-label">Password:</label>
+        <p class="user-info">{{password}}</p>
+    </div>
+    <button class="edit-btn">Edit</button>
+    <button class="save-btn" style="display: none;">Save</button>
+    <button class="change-photo-btn" style="display: none;">Change Photo</button>
+    <input type="file" class="photo-input" style="display: none;">
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $(document).on("click", ".edit-btn", function () {
+            var userProfile = $(this).closest(".user-profile");
+            var name = userProfile.find(".user-name").text();
+            var email = userProfile.find(".user-info:eq(0)").text();
+            var birthday = userProfile.find(".user-info:eq(1)").text();
+            var gender = userProfile.find('.user-info:eq(2)').text();
+            var password = userProfile.find('.user-info:eq(3)').text();;
+            var nameInput = `<input type="text" class="form-control" value="${name}" required>`;
+            var emailInput = `<input type="email" class="form-control" value="${email}" required>`;
+            var birthdayInput = `<input type="text" class="form-control" value="${birthday}" required>`;
+            var genderInput = `
+        <select name="gender" class="form-control gender-input" id="gender-input">
+            <option value="man" ${gender === 'man' ? 'selected' : ''}>man</option>
+            <option value="woman" ${gender === 'woman' ? 'selected' : ''}>woman</option>
+        </select>
+        `;
+            var passwordInput = `<input type="password" class="form-control" value="${password}" required>`;
+
+            userProfile.find(".user-name").html(nameInput);
+            userProfile.find(".user-info:eq(0)").html(emailInput).prev('.user-info-label').hide();
+            userProfile.find(".user-info:eq(1)").html(birthdayInput).prev('.user-info-label').hide();
+            userProfile.find(".user-info:eq(2)").html(genderInput).prev('.user-info-label').hide();
+            userProfile.find(".user-info:eq(3)").html(passwordInput).prev('.user-info-label').hide();
+            userProfile.find(".edit-btn").hide();
+            userProfile.find(".save-btn").show();
+            userProfile.find(".change-photo-btn").show();
+        });
+
+
+
+        $(document).on("click", ".save-btn", function () {
+            var userProfile = $(this).closest(".user-profile");
+            var name = userProfile.find(".user-name input").val();
+            var email = userProfile.find(".user-info:eq(0) input").val();
+            var birthday = userProfile.find(".user-info:eq(1) input").val();
+            var gender = userProfile.find('.user-info:eq(2) select').val();
+            var password = userProfile.find('.user-info:eq(3) input').val();
+
+            userProfile.find(".user-name").text(name);
+            userProfile.find(".user-info:eq(0)").text(email).prev('.user-info-label').show();
+            userProfile.find(".user-info:eq(1)").text(birthday).prev('.user-info-label').show();
+            userProfile.find(".user-info:eq(2)").text(gender).prev('.user-info-label').show();
+            userProfile.find(".user-info:eq(3)").text(password).prev('.user-info-label').show();
+
+            userProfile.find(".edit-btn").show();
+            userProfile.find(".save-btn").hide();
+            userProfile.find(".change-photo-btn").hide();
+
+            // Execute AJAX request here to save the updated values
+
+            // Example AJAX request
+            $.post('/update_user', {
+                name: name,
+                email: email,
+                birthday: birthday,
+                gender: gender,
+                password: password,
+            }, function (data) {
+                // Handle the server response
+                console.log(data);
+            });
+        });
+
+        // Get references to page elements
+        $(document).on("click", ".change-photo-btn", function () {
+            $(this).hide();
+            var userProfile = $(this).closest(".user-profile");
+            userProfile.find(".photo-input").click();
+        });
+
+        $(document).on("change", ".photo-input", function () {
+            var userProfile = $(this).closest(".user-profile");
+            var file = this.files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                var photoUrl = reader.result;
+                userProfile.find(".user-profile-photo").attr("src", photoUrl);
+
+                $("#userPhoto").attr("src", photoUrl);
+                // Send the updated avatar to the server
+                var formData = new FormData();
+                formData.append('avatar', file);
+
+                // Example AJAX request to upload the avatar
+                $.ajax({
+                    url: '/update-profile-picture',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        // Handle the server response
+                        console.log(data);
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error
+                        console.error(error);
+                    }
+                });
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+    });
+
+
+</script>
+{% endblock %}
