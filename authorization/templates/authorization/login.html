@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {%block contents%}
 <H1><a href="{{ url_for('index.main_page') }}" class="main-btn">Medilife</a></H1>
-<div class="container">
+<div class="c0ntainer ">
+  {% if message %}
+  <div class='btn btn-info' id="displaymessage" style="width:100%;margin-top:10px;">{{ message }}</div>
+  {% endif %}
   <div class="form">
     <form action="" method="POST">
 

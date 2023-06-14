@@ -1,29 +1,38 @@
 {%extends 'base2.html'%}
 {%block contents%}
-<div class="conteiner">
-    <div class="page-name">
-        <H1>Результат</H1>
-    </div>
+<div class="container">
+
     <div class="result">
-        <div class="main-word">Ваша хвороба:</div>
+        <h3 class="main-word">Your disease:
+        </h3>
         <div class="result-item">
             <h2>{{the_result}}</h2>
         </div>
     </div>
-    <div class="description">
-        <div class="main-word">
-            <h3 class="main-word">Опис</h3>
+    <div class="main-part">
+        <div class="description-container">
+            <div class="description">
+                <div class="main-word">
+                    <h3 class="main-word">Description</h3>
+                </div>
+                {{the_description}}
+            </div>
+            <div class="photo-container">
+                <div class="disease-photo">
+                    <img src="../../../static/images/{{the_picture}}" alt="disease-photo">
+                </div>
+            </div>
         </div>
-        text
     </div>
-    <div class="disease-photo">
-        <img src="#" alt="disease-photo">
-    </div>
-    <div class="treatment">
-        <div class="main-word">Лікування</div>
-        <div class="treatment-item">
 
-            Якесь лікування
+    <div class="treatment-container">
+        <div class="treatment">
+            <H3 div class="main-word">Treatment
+            </h3>
+            <div class="treatment-item">
+
+                {{the_treatment}}
+            </div>
         </div>
     </div>
 

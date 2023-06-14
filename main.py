@@ -8,6 +8,7 @@ from logout.logout import logout
 from index.index import index
 from admin.admin import admin
 from user_account.user_account import user_account
+from user_account.diseases_history import diseases_history
 
 
 
@@ -20,7 +21,6 @@ app.config['dbconfig'] = {'host': '127.0.0.1',
             'database': 'web_oriented_system_for_diagnosis_of_diseases', }
 
 
-
 app.register_blueprint(index)
 app.register_blueprint(authorization)
 app.register_blueprint(registration)
@@ -30,6 +30,7 @@ app.register_blueprint(result)
 app.register_blueprint(logout)
 app.register_blueprint(admin)
 app.register_blueprint(user_account)
+app.register_blueprint(diseases_history)
 
 
 if __name__ == '__main__':

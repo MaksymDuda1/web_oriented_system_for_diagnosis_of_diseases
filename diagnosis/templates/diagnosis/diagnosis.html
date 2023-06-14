@@ -1,47 +1,110 @@
 {% extends 'base2.html' %}
+
 {% block contents %}
 
 <div class="container">
-    <h1>Сторінка діагностування</h1>
+    <h1>Diagnosis page</h1>
     <div class="text">
-        <p>Тут ви можете дізнатись вашу потенційну хворобу</p>
+        <p>We use a specially developed algorithm to determine the disease.</p>
+        <p>Just enter symptoms one-by-one, and you will know your potential disease.</p>
+        <p>Try it!</p>
     </div>
 
-    <h1>Введіть симптоми</h1>
-    <input type="text" name="symptoms" id="symptoms">
-    <button type="button" onclick="addSymptoms()">Додати</button>
-    <form action="{{url_for('result.show_result')}}" method="POST" name="symptoms-form">
+    <div class="symptoms-container">
+        <h1>Enter symptom</h1>
+        <input type="text" name="symptoms" id="symptoms">
+        <button type="button" onclick="addSymptoms()">Add symptom</button>
+        <form action="{{url_for('result.show_result')}}" method="POST" name="symptoms-form">
 
-        <div name="content" id="content">
-        </div>
+            <div name="content" id="content">
+            </div>
 
-        <input type="hidden" name="symptoms_input" id="symptoms_input">
-        <button onclick="sendData()" type="submit" id="send-data-btn" disabled>Надіслати</button>
+            <input type="hidden" name="symptoms_input" id="symptoms_input">
+            <button class="send-data-bt" onclick="sendData()" type="submit" id="send-data-btn"
+                disabled>Continue</button>
 
-    </form>
+            {% if data %}
+            <div class="info-message">
+                <h3>{{ data }}</h3>
+            </div>
+            {% endif %}
+
+            <div class="info-icon">
+                <div class="symptoms-list-container" id="symptomsListContainer">
+                    <h2>Symptoms list</h2>
+                    <ul id="symptomsList">
+                        {% for row in symptoms%}
+                        <li class="symptoms-row">
+                            <span>{{"".join(row)}}</span>
+
+                        </li>
+                        {%endfor%}
+                    </ul>
+                </div>
+
+                <div class="fa fa-info-circle" style="font-size:24px;" onmouseover=" showSymptomsList()"
+                    onmouseout="hideSymptomsList()">
+                </div>
+            </div>
+
+        </form>
+    </div>
+
 </div>
 
 <script>
+    $.get('/result', {}, function (data) {
+        $("#displaymessage").html(data);
+        $("#displaymessage").show();
+
+    });
+    if (msg) {
+        $("#displaymessage").html(msg);
+        $("#displaymessage").show()
+        setTimeout(function () {
+            $("#displaymessage").hide();
+        }, 5000); // 5000 мілісекунд = 5 секунд
+
+    }
+
+
     function addSymptoms() {
-        // Отримати введені симптоми з поле вводу
         const symptomsInput = document.getElementById("symptoms");
         const symptoms = symptomsInput.value;
 
-        // Створити новий елемент для відображення симптомів
         if (symptoms.length != 0) {
-            const symptomElement = document.createElement("p");
-            symptomElement.innerText = symptoms;
+            const symptomElement = document.createElement("li");
+            symptomElement.classList.add("symptoms-row");
 
-            // Отримати контейнер для відображення симптомів
+            const symptomNameSpan = document.createElement("span");
+            symptomNameSpan.innerText = symptoms;
+            symptomElement.appendChild(symptomNameSpan);
+
+            const editButton = document.createElement("a");
+            editButton.classList.add("edit");
+            editButton.setAttribute("title", "edit");
+            editButton.setAttribute("data-toggle", "tooltip");
+            editButton.innerHTML = '<i class="fa fa-pencil"></i>';
+            editButton.addEventListener("click", function () {
+                editSymptom(this);
+            });
+            symptomElement.appendChild(editButton);
+
+            const deleteButton = document.createElement("a");
+            deleteButton.classList.add("delete");
+            deleteButton.setAttribute("title", "delete");
+            deleteButton.setAttribute("data-toggle", "tooltip");
+            deleteButton.innerHTML = '<i class="fa fa-trash-o"></i>';
+            deleteButton.addEventListener("click", function () {
+                deleteSymptom(this);
+            });
+            symptomElement.appendChild(deleteButton);
+
             const container = document.getElementById("content");
-
-            // Додати новий елемент з симптомами до контейнера
             container.appendChild(symptomElement);
 
-            // Очистити поле вводу
             symptomsInput.value = "";
 
-            // Змінити стан кнопки надіслати
             const sendBtn = document.getElementById("send-data-btn");
             sendBtn.disabled = false;
         }
@@ -51,13 +114,46 @@
         const symptomsList = document.getElementById("content").childNodes;
         const symptomsArray = [];
         for (let i = 0; i < symptomsList.length; i++) {
-            symptomsArray.push(symptomsList[i].textContent);
+            if (symptomsList[i].tagName === "LI") {
+                const symptomName = symptomsList[i].querySelector("span").innerText;
+                symptomsArray.push(symptomName);
+            }
         }
 
         const symptomsInput = document.getElementById("symptoms_input");
-        symptomsInput.value = JSON.stringify(symptomsArray)
+        symptomsInput.value = JSON.stringify(symptomsArray);
         document.forms["symptoms-form"].submit();
+    }
 
+    function editSymptom(button) {
+        const symptomElement = button.parentNode;
+        const symptomName = symptomElement.querySelector("span").innerText;
+        const symptomsInput = document.getElementById("symptoms");
+
+        symptomsInput.value = symptomName;
+        symptomElement.parentNode.removeChild(symptomElement);
+
+        const sendBtn = document.getElementById("send-data-btn");
+        sendBtn.disabled = true;
+    }
+
+    function deleteSymptom(button) {
+        const symptomElement = button.parentNode;
+        symptomElement.parentNode.removeChild(symptomElement);
+
+        const sendBtn = document.getElementById("send-data-btn");
+        const symptomsList = document.getElementById("content").childNodes;
+        sendBtn.disabled = symptomsList.length === 0;
+    }
+
+    function showSymptomsList() {
+        const symptomsListContainer = document.getElementById("symptomsListContainer");
+        symptomsListContainer.style.display = "block";
+    }
+
+    function hideSymptomsList() {
+        const symptomsListContainer = document.getElementById("symptomsListContainer");
+        symptomsListContainer.style.display = "none";
     }
 
 </script>

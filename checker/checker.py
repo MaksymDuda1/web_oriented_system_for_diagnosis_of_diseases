@@ -14,7 +14,7 @@ def check__logged_in(func):
 def check_role(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if session['role']== 'admin':
+        if session['role'] == 'admin':
             return func(*args, **kwargs)
         return 'You are not admin'
 

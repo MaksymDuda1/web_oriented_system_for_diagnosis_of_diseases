@@ -11,7 +11,7 @@ authorization = Blueprint('authorization', __name__, template_folder='templates'
 
 def loggining_checker(req):
     password,hashed_password,role,email = get_login_data(req)
-    if hashed_password is not None and check_password_hash(hashed_password, password):
+    if hashed_password  and check_password_hash(hashed_password, password):
         session['logged_in'] = True
         session['email'] = email
         session['password'] = req.form['password']
@@ -25,9 +25,9 @@ def loggining_checker(req):
             return redirect('/admin')
         else:
             return redirect('/')
-
     else:
-        return "wrong pass"
+        msg = "Invalid email or password"
+        return render_template('authorization/login.html', the_title="Login", message=msg)
 
 
 @authorization.route('/login',methods=['GET', 'POST'])

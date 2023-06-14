@@ -1,0 +1,22 @@
+{% extends "base2.html" %}
+
+{% block contents %}
+<div class="container">
+    <h1>Your medical history</h1>
+    {% if diseases %}
+    {% for row in diseases %}
+    <div class="user-history">
+        <h2 name="disease">{{ row.name }}</h2>
+        {{ row.arrival_date }}
+        <br>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="user-history">
+        <h2>Your medical history is empty</h2>
+        <br>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

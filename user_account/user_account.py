@@ -9,14 +9,11 @@ user_account = Blueprint('user_account',__name__,template_folder='templates')
 
 @user_account.route('/user_page')
 def user_page():
-    email = session['email']
     filepath = session.get('filepath')
-    password =session['password']
+    password = session['password']
     user_id = ''.join(str(id) for id in session['user_id'])
     user_data = get_user(user_id)
     return render_template('user_account/user_account.html', filepath=filepath,user=user_data,password = password)
-
-
 @user_account.route('/update_user', methods=['POST'])
 def do_user_update():
     if request.method == 'POST':
@@ -30,7 +27,6 @@ def do_user_update():
             result = do_user_update_user(request)
             return result
 @user_account.route('/update-profile-picture',methods = ['POST'])
-
 def do_profile_picture_update():
     user_id = ''.join(str(id) for id in session['user_id'])
     file = request.files['avatar']
@@ -39,7 +35,7 @@ def do_profile_picture_update():
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         session['filepath'] = filepath
         file.save(filepath)
-        return  update_picture(filename,user_id)
+        return update_picture(filename,user_id)
 
 
 

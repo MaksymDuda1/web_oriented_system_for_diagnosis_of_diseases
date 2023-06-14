@@ -2,6 +2,8 @@
 
 {% block contents %}
 <div class="user-profile">
+    <div class='btn btn-info' id="displaymessage" style="display:none;width:100%;margin-top:10px;"></div>
+
     <img class="user-profile-photo"
         src="{{ session.get('filepath') or url_for('static', filename='images/user.png') }}">
     <h1 class="user-name">{{ user.name }}</h1>
@@ -28,6 +30,19 @@
 </div>
 
 <script>
+    function validateEmail(email) {
+        // Використовуйте відповідний регулярний вираз для перевірки формату email
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+    // Функція для перевірки правильності формату дати народження (YYYY-MM-DD)
+    function validateBirthday(birthday) {
+        // Використовуйте відповідний регулярний вираз для перевірки формату дати народження
+        var regex = /^\d{4}-\d{2}-\d{2}$/;
+        return regex.test(birthday);
+    }
+
 
     $(document).ready(function () {
         $(document).on("click", ".edit-btn", function () {
@@ -60,6 +75,8 @@
 
 
 
+
+
         $(document).on("click", ".save-btn", function () {
             var userProfile = $(this).closest(".user-profile");
             var name = userProfile.find(".user-name input").val();
@@ -78,7 +95,26 @@
             userProfile.find(".save-btn").hide();
             userProfile.find(".change-photo-btn").hide();
 
-            // Execute AJAX request here to save the updated values
+            var isValidEmail = validateEmail(email);
+            var isValidBirthday = validateBirthday(birthday);
+            if (!isValidEmail) {
+                $("#displaymessage").html("Wrong email");
+                $("#displaymessage").show()
+                setTimeout(function () {
+                    $("#displaymessage").hide();
+                }, 5000); // 5000 мілісекунд = 5 секунд
+
+                return; // Перервати збереження, якщо email недійсний
+            }
+
+            if (!isValidBirthday) {
+                $("#displaymessage").html("Wrong date of birth");
+                $("#displaymessage").show()
+                setTimeout(function () {
+                    $("#displaymessage").hide();
+                }, 5000); // 5000 мілісекунд = 5 секунд
+                return; // Перервати збереження, якщо дата народження недійсна
+            }
 
             // Example AJAX request
             $.post('/update_user', {

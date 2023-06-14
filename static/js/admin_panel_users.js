@@ -34,11 +34,6 @@ $(document).on("click", ".edit", function () {
         <option value="admin" ${role === 'admin' ? 'selected' : ''}>admin</option>
     </select>
 `)
-
-
-
-
-
     $(this).removeClass("edit").addClass("save").attr("title", "Save").find("i").removeClass("fa-pencil").addClass("fa-save");
 });
 
@@ -60,7 +55,7 @@ $(document).on("click", ".save", function () {
     row.find("td:eq(5)").text(role);
 
 
-    $.post('/update', { name: name, email: email, birthday: birthday, gender: gender, role: role }, function (data) {
+    $.post('/update_users', { name: name, email: email, birthday: birthday, gender: gender, role: role }, function (data) {
         $("#displaymessage").html(data);
         $("#displaymessage").show();
         if (data === "Email already exists")
@@ -78,7 +73,7 @@ $(document).on("click", ".save", function () {
 $(document).on("click", ".delete", function () {
     var row = $(this).closest("tr");
     var email = row.find(".email").text(); // Retrieve the email value from the td element
-    $.post('/delete', { email: email }, function (data) {
+    $.post('/delete_users', { email: email }, function (data) {
         $("#displaymessage").html(data);
         $("#displaymessage").show();
         if (data.includes("User deleted successfully")) {
@@ -154,9 +149,15 @@ document.addEventListener("DOMContentLoaded", function () {
             //
             // Відправити дані на сервер для збереження
             $.post('/add_users', { name: name, email: email, gender: gender, birthday: birthday, password: password, role: role }, function (data) {
-                $("#displaymessage").html(data);
-                $("#displaymessage").show();
                 if (data === "Email already exists") {
+                    $("#displaymessage").html(data);
+                    $("#displaymessage").show();
+                    deleteRow(newRow);
+                    return;
+
+                } else {
+                    $("#displaymessage").html(data);
+                    $("#displaymessage").show();
                     // Видалити рядок, якщо електронна адреса вже існує
                     deleteRow(newRow);
                     return;
