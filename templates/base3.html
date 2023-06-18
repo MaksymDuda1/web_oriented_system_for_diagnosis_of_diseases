@@ -18,9 +18,10 @@
     <nav class="navbar">
         <a href="{{ url_for('index.main_page') }}" class="logo">Medilife</a>
         <ul class="nav-links">
-            <li><a href="{{ url_for('index.main_page') }}">Main page</a></li>
+            <li><a href="{{ url_for('admin.show_main_page') }}">Main page</a></li>
             <li><a href="{{url_for('admin.do_users')}}">Users</a></li>
             <li><a href="{{ url_for('admin.do_diseases') }}">Diseases</a></li>
+            <li><a href="{{ url_for('admin.do_symptoms') }}">Symptoms</a></li>
         </ul>
         {% if 'logged_in' in session %}
 

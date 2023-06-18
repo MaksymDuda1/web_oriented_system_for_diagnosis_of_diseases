@@ -3,13 +3,13 @@
 {%block contents%}
 <div class="container">
     <p>
-    <h1 align="center">Diseases editing page</h1>
+    <h1 align="center">Sympotms editing page</h1>
     </p>
     <div class="table-wrapper">
         <div class="table-title">
             <div class="row">
                 <div class="col-sm-6">
-                    <h2>Diseases</h2>
+                    <h2>Symptoms</h2>
                 </div>
                 <div class="col-sm-6 text-right">
                     <button type="button" class="add btn btn-info add-new" data-id="new"><i class="fa fa-plus"></i>
@@ -21,20 +21,16 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Disease</th>
-                    <th>Description</th>
-                    <th>Treatment</th>
-                    <th>Symptoms</th>
+                    <th>Symptom</th>
+                    <th>Multiplier</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for row in diseases %}
+                {% for row in symptoms %}
                 <tr>
                     <td>{{row.name}}</td>
-                    <td>{{row.description}}</td>
-                    <td>{{row.treatment}}</td>
-                    <td>{{row.symptoms}}</td>
+                    <td>{{row.multiplier}}</td>
                     <td>
                         <a class="add" title="add" data-toggle="tooltip" id="{{ row.name }}"><i
                                 class="fa fa-user-plus"></i></a>
@@ -49,14 +45,15 @@
         </table>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+
     $(document).ready(function () {
         $(document).on("click", ".edit", function () {
             var row = $(this).closest("tr");
-            var disease = row.find("td:eq(0)").text();
-            var description = row.find("td:eq(1)").text();
-            var treatment = row.find("td:eq(2)").text();
-            var symptoms = row.find("td:eq(3)").text();
+            var symptom = row.find("td:eq(0)").text();
+            var multiplier = row.find("td:eq(1)").text();
 
             var input = $(this).parents("tr").find('input[type="text"]');
             input.each(function () {
@@ -68,27 +65,21 @@
                 }
             });
 
-            row.find("td:eq(0)").html(`<input type="text" name="disease" class="form-control" value="${disease}" required>`);
-            row.find("td:eq(1)").html(`<input type="text" name="description" class="form-control" value="${description}" required>`);
-            row.find("td:eq(2)").html(`<input type="text" name="treatment" class="form-control" value="${treatment}" required>`);
-            row.find("td:eq(3)").html(`<input type="text" name="symptoms" class="form-control" value="${symptoms}" required>`);
+            row.find("td:eq(0)").html(`<input type="text" name="symptom" class="form-control" value="${symptom}" required>`);
+            row.find("td:eq(1)").html(`<input type="text" name="multiplier" class="form-control" value="${multiplier}" required>`);
 
             $(this).removeClass("edit").addClass("save").attr("title", "Save").find("i").removeClass("fa-pencil").addClass("fa-save");
         });
 
         $(document).on("click", ".save", function () {
             var row = $(this).closest("tr");
-            var disease = row.find("td:eq(0) input").val();
-            var description = row.find("td:eq(1) input").val();
-            var treatment = row.find("td:eq(2) input").val();
-            var symptoms = row.find("td:eq(3) input").val();
+            var symptom = row.find("td:eq(0) input").val();
+            var multiplier = row.find("td:eq(1) input").val();
 
-            row.find("td:eq(0)").text(disease);
-            row.find("td:eq(1)").text(description);
-            row.find("td:eq(2)").text(treatment);
-            row.find("td:eq(3)").text(symptoms);
+            row.find("td:eq(0)").text(symptom);
+            row.find("td:eq(1)").text(multiplier);
 
-            $.post('/update_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {
+            $.post('/update_symptoms', { symptom: symptom, multiplier: multiplier }, function (data) {
                 $("#displaymessage").html(data);
                 $("#displaymessage").show();
                 if (data === "Update successful") {
@@ -101,65 +92,49 @@
 
         $(document).on("click", ".delete", function () {
             var row = $(this).closest("tr");
-            var disease = row.find("td:eq(0)").text();
+            var symptom = row.find("td:eq(0)").text();
             // Perform delete operation using disease value
 
-            $.post('/delete', { disease: disease }, function (data) {
+            $.post('/delete_symptoms', { symptom: symptom }, function (data) {
                 $("#displaymessage").html(data);
                 $("#displaymessage").show();
-                if (data === "Delete successfully") {
+                if (data === "Deleted successfully") {
                     row.remove();
                 }
             });
         });
+    });
 
-        document.addEventListener("DOMContentLoaded", function () {
-            // Отримати кнопку "Add New"
-            var addBtn = document.querySelector(".add-new");
+    document.addEventListener("DOMContentLoaded", function () {
+        var addBtn = document.querySelector(".add-new");
 
-            // Додати обробник події для кнопки "Add New"
+        if (addBtn) {
             addBtn.addEventListener("click", function () {
-                // Створити новий рядок для введення даних користувача
                 var newRow = document.createElement("tr");
 
-                // Створити HTML-розмітку для нового рядка
                 newRow.innerHTML = `
-            <td><input type="text" name="disease" id="disease" class="form-control disease-input " placeholder="Enter disease" required></td>
-            <td><input type="text" name="description" class="form-control description-input " placeholder="Enter description" required></td>
-            <td><input type="text" name="treatment" class="form-control treatment-input" placeholder="Enter treatment" required></td>
-            <td><input type="text" name="symptoms" class="form-control sympotms-input " placeholder="Enter symptoms" required></td>
-
+            <td><input type="text" name="symptom" class="form-control symptom-input" placeholder="Enter symptom" required></td>
+            <td><input type="text" name="multiplier" class="form-control multiplier-input" placeholder="Enter multiplier" required></td>
             <td>
                 <a class="add" title="add" data-toggle="tooltip"><i class="fa fa-user-plus"></i></a>
                 <a class="save" title="save" data-toggle="tooltip"><i class="fa fa-save"></i></a>
                 <a class="delete" title="delete" data-toggle="tooltip"><i class="fa fa-trash-o"></i></a>
             </td>`;
 
-                // Зміна кнопки редагування на кнопку збереження
                 var editBtn = newRow.querySelector(".save");
                 editBtn.addEventListener("click", function () {
-                    // Додайте код для збереження даних з нового рядка
-                    var diseaseInput = newRow.querySelector(".disease-input");
-                    var descriptionInput = newRow.querySelector(".description-input");
-                    var treatmentInput = newRow.querySelector(".treatment-input");
-                    var sympotmsInput = newRow.querySelector(".sympotms-input");
-                    var disease = nameInput.value;
-                    var description = emailInput.value;
-                    var treatment = birthdayInput.value;
-                    var sympotms = genderInput.value;
+                    var symptomInput = newRow.querySelector(".symptom-input");
+                    var multiplierInput = newRow.querySelector(".multiplier-input");
+                    var symptom = symptomInput.value;
+                    var multiplier = multiplierInput.value;
 
-                    // Виконати дії для збереження даних
                     var row = this.closest("tr");
 
                     this.querySelector("i").classList.remove("fa-save");
                     this.querySelector("i").classList.add("fa-pencil");
 
-                    // Виконати перевірку електронної адреси на сервері перед збереженням
-
-                    //
-                    // Відправити дані на сервер для збереження
-                    $.post('/add_disease', { disease: disease, description: description, treatment: treatment, sympotms: sympotms }, function (data) {
-                        if (data === "Disease already exists") {
+                    $.post('/add_symptoms', { symptom: symptom, multiplier: multiplier }, function (data) {
+                        if (data === "Symptom already exists") {
                             $("#displaymessage").html(data);
                             $("#displaymessage").show();
                             deleteRow(newRow);
@@ -168,13 +143,13 @@
                         } else {
                             $("#displaymessage").html(data);
                             $("#displaymessage").show();
-                            // Видалити рядок, якщо електронна адреса вже існує
                             deleteRow(newRow);
                             return;
+
                         }
                     });
 
-                    // Видалити рядок після збереження
+
                     row.querySelector(".delete").addEventListener("click", function () {
                         row.remove();
                     });
@@ -184,15 +159,15 @@
                 var tableBody = document.querySelector("tbody");
                 tableBody.appendChild(newRow);
             });
-        });
-
-
-        // Функція видалення рядка
-        function deleteRow(row) {
-            var parentRow = row.parentNode;
-            parentRow.removeChild(row);
         }
     });
+
+    // Функція видалення рядка
+    function deleteRow(row) {
+        var parentRow = row.parentNode;
+        parentRow.removeChild(row);
+    }
+
 </script>
 
 {%endblock%}

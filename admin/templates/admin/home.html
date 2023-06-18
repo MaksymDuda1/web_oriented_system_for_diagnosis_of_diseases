@@ -1,5 +1,77 @@
 {% extends "base3.html"%}
 {%block contents%}
 
+<div class="analitycs">
+    <div class="users-count">
+        <div class="mini-container">
+            <div class="centred_text">
+                <div class="amount">{{the_users_amount}}</div>
+            </div>
+            <div class="text">
+                Count of users
+            </div>
+        </div>
+    </div>
+
+    <div class="popular-disease">
+        <div class="mini-container">
+            <div class="centred_text">
+                <div class="amount">{{the_disease_amount}}</div>
+            </div>
+            <div class="text">
+                The most popular disease: {{the_disease}}
+            </div>
+        </div>
+    </div>
+
+    <div class="diagnostics-count">
+        <div class="mini-container">
+            <div class="centred_text">
+                <div class="amount">{{the_diagnosis_amount}}</div>
+            </div>
+            <div class="text">
+                Diagnosis was made
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="last_diagnose">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h2>Last diagnose</h2>
+                </div>
+
+            </div>
+        </div>
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Disease</th>
+                    <th>Symptoms</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for diagnosis in last %}
+                <tr>
+                    <td>{{ diagnosis['u'] }}</td>
+                    <td>{{ diagnosis['name'] }}</td>
+                    <td>{{ diagnosis['GROUP_CONCAT(symptoms.name)'] }}</td>
+                    <td>{{ diagnosis['date'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+
 
 {%endblock%}

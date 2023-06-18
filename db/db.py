@@ -121,6 +121,19 @@ def get_email(req):
         result = cursor.fetchone()
         return result
 
+def get_symptom(req):
+ with UseDatabase(current_app.config['dbconfig']) as cursor:
+        name = req.form['symptom']
+        _SQL = """select name from symptoms
+                  where name = %s
+               """
+        cursor.execute(_SQL, (name,))
+        result = cursor.fetchone()
+        return result
+
+
+
+
 def insertData(req,file):
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         password = req.form['password']
@@ -138,6 +151,17 @@ def insertData(req,file):
                               file,
                               hashed_password))
         return 1
+
+def insert_symptom_data(req):
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        symptom = req.form['symptom']
+        multiplier = req.form['multiplier']
+        _SQL = """insert into symptoms
+           (name,multiplier)
+           values
+           (%s, %s)
+           """
+        cursor.execute(_SQL,(symptom,multiplier))
 
 def show_users():
     with UseDatabase(current_app.config['dbconfig']) as cursor:
@@ -187,14 +211,15 @@ def do_user_update_admin(name,email,birthday,gender,role):
         msg = 'Record successfully Updated'
         return msg
 
-# def do_disease_update_admin(disease,description,treatment,symptoms):
-#     with UseDatabase(current_app.config['dbconfig']) as cursor:
-#         _SQL = """Update diseases
-#            set name = %s,description = %s,treatment = %s,
-#            where email = %s"""
-#         cursor.execute(_SQL, (disease, description, treatment))
-#         msg = 'Record successfully Updated'
-#         return msg
+def do_symptom_update(name,multiplier):
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL ="""Update symptoms 
+        set name = %s, multiplier = %s
+        where name = %s"""
+        cursor.execute(_SQL,(name,multiplier,name))
+        msg = 'Record successfully Updated'
+        return msg
+
 
 def do_user_update_user(req):
     user_id = ''.join(str(id) for id in session['user_id'])
@@ -234,6 +259,32 @@ def do_user_delete(email):
         cursor.execute(_SQL,(email,))
         msg = 'User deleted successfully'
         return msg
+
+def get_symptom_id(name):
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL ="""select symptom_id from symptoms 
+        where name = %s"""
+        cursor.execute(_SQL,(name,))
+        id = cursor.fetchone()
+        return id
+
+def do_disease_symptom_delete(name):
+    id = get_symptom_id(name)
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = """delete from diseases_symptoms
+        where symptom_id = %s"""
+        cursor.execute(_SQL, id)
+
+
+def do_symptom_delete(name):
+    do_disease_symptom_delete(name)
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = """delete from symptoms
+        where name = %s"""
+        cursor.execute(_SQL,(name,))
+        msg = 'Deleted successfully'
+        return msg
+
 def do_user_add(name,email,birthday,gender,password,role):
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL = """insert into users
@@ -278,8 +329,7 @@ def get_disease_id(result):
 def show_diseases():
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL = """SELECT diseases.name, diseases.description, diseases.treatment, 
-                GROUP_CONCAT(DISTINCT symptoms.name) AS symptoms,
-                GROUP_CONCAT(DISTINCT symptoms.multiplier) AS multipliers
+                GROUP_CONCAT(DISTINCT symptoms.name) AS symptoms
                 FROM diseases
                 JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
                 JOIN symptoms ON diseases_symptoms.symptom_id = symptoms.symptom_id
@@ -290,4 +340,64 @@ def show_diseases():
         column_names = [nam[0] for nam in cursor.description]
         diseases = [dict(zip(column_names, row)) for row in rows]
         return diseases
+
+def show_symptoms():
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        cursor.execute("SELECT * FROM symptoms ORDER BY symptom_id")
+        symptoms = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+        symptoms = [dict(zip(column_names, symptom)) for symptom in symptoms]
+        return symptoms
+def users_count():
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL="select count(user_id) from users"
+        cursor.execute(_SQL)
+        result =  cursor.fetchone()
+        return  result
+
+def most_popular_disease():
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = """SELECT d.name, COUNT(ud.disease_id) AS disease_count
+         FROM diseases AS d
+        JOIN users_diseases AS ud ON ud.disease_id = d.disease_id
+        GROUP BY d.name
+        ORDER BY disease_count DESC
+        LIMIT 1"""
+        cursor.execute(_SQL)
+        results = cursor.fetchall()
+        if results:
+            disease_name = results[0][0]
+            amount = results[0][1]
+            return disease_name, amount
+
+def diagnosis_count():
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = "select count(user_disease_id) from users_diseases"
+        cursor.execute(_SQL)
+        result = cursor.fetchone()
+        return result
+
+def last_diagnose():
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = """SELECT users.name  as u, diseases.name, GROUP_CONCAT(symptoms.name),
+                 DATE(users_diseases.arrival_date) as date
+                 FROM users
+                 JOIN users_diseases ON users.user_id = users_diseases.user_id
+                 JOIN diseases ON users_diseases.disease_id = diseases.disease_id
+                 JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
+                 JOIN symptoms ON diseases_symptoms.symptom_id = symptoms.symptom_id
+                 WHERE users_diseases.user_disease_id = (
+                 SELECT MAX(user_disease_id)
+                 FROM users_diseases)
+                 GROUP BY u, diseases.name, date
+                 """
+        cursor.execute(_SQL)
+        data = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
+        last_diagnosis = [dict(zip(column_names, row)) for row in data]
+        return last_diagnosis
+
+
+
+
 
