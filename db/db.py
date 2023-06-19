@@ -211,12 +211,16 @@ def do_user_update_admin(name,email,birthday,gender,role):
         msg = 'Record successfully Updated'
         return msg
 
-def do_symptom_update(name,multiplier):
+
+def do_symptom_update(req):
+    name = req.form['symptom']
+    multiplier = req.form['multiplier']
+    id = get_symptom_id(name)
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL ="""Update symptoms 
         set name = %s, multiplier = %s
         where name = %s"""
-        cursor.execute(_SQL,(name,multiplier,name))
+        cursor.execute(_SQL, (name,multiplier,name,))
         msg = 'Record successfully Updated'
         return msg
 

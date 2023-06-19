@@ -93,6 +93,34 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="symptomsModal" tabindex="-1" role="dialog" aria-labelledby="treatmentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="treatmentModalLabel">Choose symptoms</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    {% for row in symptoms %}
+                    <div class="form-check">
+                        <input class="form-check-input symptom-checkbox" type="checkbox" name="selectedSymptoms"
+                            value="{{ row.name }}">
+                        <label class="form-check-label" for="symptom{{ loop.index }}">{{ row.name }}</label>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary save-symptoms">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -116,6 +144,31 @@
                 $("#treatmentModal").modal('hide');
             });
         });
+        $(document).on("click", ".symptoms-btn", function () {
+            var disease = $(this).attr('id');
+            var symptomsCell = $("#" + disease).closest("tr").find("td:nth-child(4)");
+
+            $("#symptomsModal").modal('show');
+
+            $("#symptomsModal .save-symptoms").click(function () {
+                var selectedSymptoms = getSelectedSymptoms();
+                symptomsCell.text(selectedSymptoms.join(', '));
+                $("#symptomsModal").modal('hide');
+            });
+        });
+
+        function getSelectedSymptoms() {
+            var selectedSymptoms = [];
+            $("#symptomsModal .symptom-checkbox:checked").each(function () {
+                selectedSymptoms.push($(this).val());
+            });
+            return selectedSymptoms;
+        }
+
+
+
+
+
 
         $(document).on("click", ".edit", function () {
             var row = $(this).closest("tr");
@@ -127,11 +180,12 @@
             // Оновити модальне вікно зі значенням "description"
             $("#diseaseDescription").val(description);
             $("#diseaseTreatment").val(treatment); // Оновити текстове поле модального вікна зі значенням "description"
+            $("#diseaseSymptoms").val(symptoms);
 
             row.find("td:eq(0)").html(`<input type="text" name="disease" class="form-control" value="${disease}" required>`);
             row.find("td:eq(1)").html(`<button class="btn btn-info description-btn" data-toggle="modal" data-target="#descriptionModal">${description}</button>`);
             row.find("td:eq(2)").html(`<button class="btn btn-info treatment-btn" data-toggle="modal" data-target="#treatmentModal">${treatment}</button>`);
-            row.find("td:eq(3)").html(`<input type="text" name="symptoms" class="form-control" value="${symptoms}" required>`);
+            row.find("td:eq(3)").html(`<button class="btn btn-info symptoms-btn" data-toggle="modal" data-target="#symptomsModal">${symptoms}</button>`);
 
             $(this).removeClass("edit").addClass("save").attr("title", "Save").find("i").removeClass("fa-pencil").addClass("fa-save");
         })
@@ -142,14 +196,21 @@
             var description = $("#diseaseDescription").val(); // Get the value from the text area
             var treatmentCell = row.find("td:eq(2)");
             var treatmentBtn = treatmentCell.find("button.treatment-btn");
-            var treatment = $("#diseaseTreatment").val(); // Get the value from the text area
-            // Remove the "Open Modal" button and update the column with the saved description
+            var treatment = $("#diseaseTreatment").val();
+            var symptomsCell = row.find("td:eq(3)");
+            var symptomsBtn = symptomsCell.find("button.symptoms-btn");
+            var selectedSymptoms = getSelectedSymptoms();
+            var symptoms = selectedSymptoms.join(',');
             descriptionBtn.replaceWith(description);
             treatmentBtn.replaceWith(treatment);
+            symptomsBtn.replaceWith(symptoms);
+            $("#symptomsModal .symptom-checkbox").prop('checked', false);
+
             $("#descriptionModal input").val('');
             $("#descriptionModal textarea").val('');
             $("#treatmentModal input").val('');
             $("#treatmentModal textarea").val('');
+
 
             var row = $(this).closest("tr");
             var disease = row.find("td:eq(0) input").val();
@@ -197,7 +258,7 @@
             <td><input type="text" name="disease" id="disease" class="form-control disease-input" placeholder="Enter disease" required></td>
             <td><button class="btn btn-info description-btn" data-toggle="modal" data-target="#descriptionModal">Open Modal</button></td>
             <td><button class="btn btn-info treatment-btn" data-toggle="modal" data-target="#treatmentModal">Open Modal</button></td>
-            <td><input type="text" name="symptoms" class="form-control symptoms-input" placeholder="Enter symptoms" required></td>
+            <td><button class="btn btn-info symptoms-btn" data-toggle="modal" data-target="#symptomsModal">Open Modal</button></td>
             <td>
                 <a class="add" title="add" data-toggle="tooltip"><i class="fa fa-user-plus"></i></a>
                 <a class="save" title="save" data-toggle="tooltip"><i class="fa fa-save"></i></a>
@@ -213,6 +274,12 @@
                 // Close the modal window
                 $("#treatmentModal").modal("hide");
             });
+            $(document).on("click", ".save-symptoms", function () {
+                // Close the modal window
+                $("#symptomsModal").modal("hide");
+
+
+            });
 
             // Change the edit button to the save button
             $(newRow).find(".save").on("click", function () {
@@ -222,10 +289,16 @@
                 var description = $("#diseaseDescription").val(); // Get the value from the text area
                 var treatmentCell = row.find("td:eq(2)");
                 var treatmentBtn = treatmentCell.find("button.treatment-btn");
-                var treatment = $("#diseaseTreatment").val(); // Get the value from the text area
-                // Remove the "Open Modal" button and update the column with the saved description
+                var treatment = $("#diseaseTreatment").val();
+                var symptomsCell = row.find("td:eq(3)");
+                var symptomsBtn = symptomsCell.find("button.symptoms-btn");
+                var selectedSymptoms = getSelectedSymptoms();
+                var symptoms = selectedSymptoms.join(',');
+
                 descriptionBtn.replaceWith(description);
                 treatmentBtn.replaceWith(treatment);
+                symptomsBtn.replaceWith(symptoms);
+                $("#symptomsModal .symptom-checkbox").prop('checked', false);
                 $("#descriptionModal input").val('');
                 $("#descriptionModal textarea").val('');
                 $("#treatmentModal input").val('');

@@ -80,10 +80,10 @@
             row.find("td:eq(1)").text(multiplier);
 
             $.post('/update_symptoms', { symptom: symptom, multiplier: multiplier }, function (data) {
-                $("#displaymessage").html(data);
-                $("#displaymessage").show();
-                if (data === "Update successful") {
-                    // Perform any necessary actions after successful update
+
+                if (data === "Record successfully Updated") {
+                    $("#displaymessage").html(data);
+                    $("#displaymessage").show();
                 }
             });
 
@@ -143,8 +143,8 @@
                         } else {
                             $("#displaymessage").html(data);
                             $("#displaymessage").show();
-                            deleteRow(newRow);
-                            return;
+
+
 
                         }
                     });

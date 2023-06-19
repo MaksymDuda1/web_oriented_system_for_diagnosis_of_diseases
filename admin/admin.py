@@ -55,7 +55,8 @@ def add_user():
 @admin.route('/diseases')
 def do_diseases():
      diseases = show_diseases()
-     return render_template('admin/diseases_page.html',diseases = diseases)
+     symptoms = show_symptoms() 
+     return render_template('admin/diseases_page.html',diseases = diseases,symptoms = symptoms)
 
 
 @admin.route('/symptoms')
@@ -96,9 +97,8 @@ def delete_symptom():
 @admin.route('/update_symptoms', methods=['POST'])
 def update_symptom():
     if request.method == 'POST':
-        name = request.form['symptom']
-        multiplier = request.form['multiplier']
-        msg = do_symptom_update(name,multiplier)
+        do_symptom_update(request)
+        msg = 'Record successfully Updated'
     return jsonify(msg)
 
 
