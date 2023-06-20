@@ -158,4 +158,3 @@ def update_symptom():
         msg = 'Record successfully Updated'
     return jsonify(msg)
 
-
