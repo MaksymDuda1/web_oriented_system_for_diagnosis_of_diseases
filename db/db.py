@@ -27,8 +27,6 @@ def fetch_all_diseases():
                """
         cursor.execute(_SQL)
         diseases = cursor.fetchall()
-        #column_names = [desc[0] for desc in cursor.description]
-        #diseases = [dict(zip(column_names, disease)) for disease in diseases]
         return diseases
 
 def get_filename(req):
@@ -252,33 +250,16 @@ def insert_into_diseases(req):
         cursor.fetchall()
 
 def update_disease_symptom(disease_id, symptom_id):
-    delete_from_disease_symptom(disease_id)
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL = """insert into diseases_symptoms
             (disease_id,symptom_id)
             values
             (%s,%s)"""
-        cursor.execute(_SQL, (symptom_id, disease_id))
-
-    # def get_disease_symptom_id(disease_id,symptom_id):
-#     with UseDatabase(current_app.config['dbconfig']) as cursor:
-#         _SQL = """select disease_symptom_id from diseases_symptoms
-#         where disease_id = %s and symptom_id = %s"""
-#         cursor.execute(_SQL,(disease_id,symptom_id,))
-# def insert_into_diseases_symptoms(disease_id,symptom_id):
-#      id  =  get_disease_symptom_id(disease_id,symptom_id)
-#      with UseDatabase(current_app.config['dbconfig']) as cursor:
-#         _SQL  ="""update diseases_symptoms
-#          set disease_id = %s, symptom_id = %s
-#          where disease_symptom_id = %s
-#          """
-#         cursor.execute(_SQL, (disease_id,symptom_id,id))
-#
+        cursor.execute(_SQL, (disease_id,symptom_id))
+        return 'Updated successfully'
 
 
-def get_disease_symptom_update():
-    with UseDatabase(current_app.config['dbconfig']) as cursor:
-        _SQL ="""update diseases_symptoms set symptom_id = """
+
 
 def do_disease_update(name,description,treatment):
     do_disease_symptom_delete(name)
@@ -332,9 +313,13 @@ def do_user_delete(email):
         msg = 'User deleted successfully'
         return msg
 
-
+def delete_from_user_disease(id):
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL ="delete from users_diseases where disease_id = %s"
+        cursor.execute(_SQL,(id,))
 def do_disease_delete(name):
     id = get_disease_id(name)
+    delete_from_user_disease(id)
     delete_from_disease_symptom(id)
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL = """delete from diseases
