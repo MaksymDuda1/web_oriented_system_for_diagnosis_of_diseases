@@ -36,6 +36,6 @@ def do_profile_picture_update():
         session['filepath'] = filepath
         file.save(filepath)
         return update_picture(filename,user_id)
-
+    return "Error: Invalid request"
 
 

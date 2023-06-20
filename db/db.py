@@ -384,7 +384,16 @@ def update_picture(filename,user_id):
         cursor.execute(_SQL,(filename,user_id))
         msg = 'profile photo updated successfully'
         return msg
-
+def save_disease_picture(filename, disease_id):
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        _SQL = """
+        UPDATE diseases
+        SET disease_picture = %s
+        WHERE disease_id = %s
+        """
+        cursor.execute(_SQL, (filename, disease_id))
+        msg = 'Disease picture updated successfully'
+        return msg
 def get_symptoms():
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL ="""select name from symptoms"""
@@ -403,11 +412,11 @@ def insert_into_history(user_id, disease_id):
 def show_diseases():
     with UseDatabase(current_app.config['dbconfig']) as cursor:
         _SQL = """SELECT diseases.name, diseases.description, diseases.treatment, 
-                GROUP_CONCAT(DISTINCT symptoms.name) AS symptoms
+                GROUP_CONCAT(DISTINCT symptoms.name) AS symptoms,diseases.disease_picture
                 FROM diseases
                 JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
                 JOIN symptoms ON diseases_symptoms.symptom_id = symptoms.symptom_id
-                GROUP BY diseases.name, diseases.description, diseases.treatment;
+                GROUP BY diseases.name, diseases.description, diseases.treatment,diseases.disease_picture;
                 """
         cursor.execute(_SQL)
         rows = cursor.fetchall()

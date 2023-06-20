@@ -25,7 +25,9 @@
                     <th>Description</th>
                     <th>Treatment</th>
                     <th>Symptoms</th>
+                    <th>Disease picture</th>
                     <th>Actions</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -35,6 +37,7 @@
                     <td>{{row.description}}</td>
                     <td>{{row.treatment}}</td>
                     <td>{{row.symptoms}}</td>
+                    <td>{{row.disease_picture}}</td>
                     <td>
                         <a class="add" title="add" data-toggle="tooltip" id="{{ row.name }}"><i
                                 class="fa fa-user-plus"></i></a>
@@ -156,6 +159,47 @@
                 $("#symptomsModal").modal('hide');
             });
         });
+        $(document).on("change", ".picture-input", function () {
+            var row = $(this).closest("tr");
+            var pictureCell = row.find("td:eq(4)");
+            var pictureBtn = pictureCell.find("button.picture-btn");
+            var file = this.files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                var photoUrl = reader.result;
+                pictureCell.find("img").attr("src", photoUrl);
+
+                var formData = new FormData();
+                formData.append('avatar', file);
+                formData.append('disease', row.find("td:eq(0) input").val());
+
+                $.ajax({
+                    url: '/update_diseases_picture',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        console.log(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+                picture = file.name; // Store the file name in the 'picture' variable
+                pictureBtn.text(file.name); // Set the button text to the file name
+            } else {
+                picture = ""; // Reset the 'picture' variable if no file selected
+                pictureBtn.text("Choose Picture"); // Reset the button text if no file selected
+            }
+        });
+
+
 
         function getSelectedSymptoms() {
             var selectedSymptoms = [];
@@ -176,6 +220,7 @@
             var description = row.find("td:eq(1)").text(); // Отримати значення з рядка "description"
             var treatment = row.find("td:eq(2)").text();
             var symptoms = row.find("td:eq(3)").text();
+            var picture = row.find("td:eq(4)").text();
 
             // Оновити модальне вікно зі значенням "description"
             $("#diseaseDescription").val(description);
@@ -186,14 +231,14 @@
             row.find("td:eq(1)").html(`<button class="btn btn-info description-btn" data-toggle="modal" data-target="#descriptionModal">${description}</button>`);
             row.find("td:eq(2)").html(`<button class="btn btn-info treatment-btn" data-toggle="modal" data-target="#treatmentModal">${treatment}</button>`);
             row.find("td:eq(3)").html(`<button class="btn btn-info symptoms-btn" data-toggle="modal" data-target="#symptomsModal">${symptoms}</button>`);
-
+            row.find("td:eq(4)").html(`<input type="file" class="form-control picture-input" accept="image/*">`);
             $(this).removeClass("edit").addClass("save").attr("title", "Save").find("i").removeClass("fa-pencil").addClass("fa-save");
         })
         $(document).on("click", ".save", function () {
             var row = $(this).closest("tr");
             var descriptionCell = row.find("td:eq(1)");
             var descriptionBtn = descriptionCell.find("button.description-btn");
-            var description = $("#diseaseDescription").val(); // Get the value from the text area
+            var description = $("#diseaseDescription").val();
             var treatmentCell = row.find("td:eq(2)");
             var treatmentBtn = treatmentCell.find("button.treatment-btn");
             var treatment = $("#diseaseTreatment").val();
@@ -201,9 +246,17 @@
             var symptomsBtn = symptomsCell.find("button.symptoms-btn");
             var selectedSymptoms = getSelectedSymptoms();
             var symptoms = selectedSymptoms.join(',');
+            var pictureCell = row.find("td:eq(4)");
+            var pictureInput = row.find("td:eq(4) input.picture-input");
+
+            var file = pictureInput[0].files[0];
+            var picture = file ? file.name : ""; // Get the file name or set it to an empty string if no file selected
+
             descriptionBtn.replaceWith(description);
             treatmentBtn.replaceWith(treatment);
             symptomsBtn.replaceWith(symptoms);
+            pictureCell.text(picture); // Set the text content of the picture cell to the file name
+
             $("#symptomsModal .symptom-checkbox").prop('checked', false);
 
             $("#descriptionModal input").val('');
@@ -211,11 +264,12 @@
             $("#treatmentModal input").val('');
             $("#treatmentModal textarea").val('');
 
+            var diseaseInput = row.find("td:eq(0) input");
+            var disease = diseaseInput.val();
+            diseaseInput.replaceWith(disease);
 
-            var row = $(this).closest("tr");
-            var disease = row.find("td:eq(0) input").val();
-
-            row.find("td:eq(0)").text(disease);
+            // Reset the picture input value
+            pictureInput.val('');
 
             $.post('/update_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {
 
@@ -253,6 +307,7 @@
             <td><button class="btn btn-info description-btn" data-toggle="modal" data-target="#descriptionModal">Open Modal</button></td>
             <td><button class="btn btn-info treatment-btn" data-toggle="modal" data-target="#treatmentModal">Open Modal</button></td>
             <td><button class="btn btn-info symptoms-btn" data-toggle="modal" data-target="#symptomsModal">Open Modal</button></td>
+            <td><input type="file" class="form-control picture-input" accept="image/*"></td>
             <td>
                 <a class="add" title="add" data-toggle="tooltip"><i class="fa fa-user-plus"></i></a>
                 <a class="save" title="save" data-toggle="tooltip"><i class="fa fa-save"></i></a>
@@ -276,11 +331,11 @@
             });
 
             // Change the edit button to the save button
-            $(newRow).find(".save").on("click", function () {
+            $(document).on("click", ".save", function () {
                 var row = $(this).closest("tr");
                 var descriptionCell = row.find("td:eq(1)");
                 var descriptionBtn = descriptionCell.find("button.description-btn");
-                var description = $("#diseaseDescription").val(); // Get the value from the text area
+                var description = $("#diseaseDescription").val();
                 var treatmentCell = row.find("td:eq(2)");
                 var treatmentBtn = treatmentCell.find("button.treatment-btn");
                 var treatment = $("#diseaseTreatment").val();
@@ -288,22 +343,30 @@
                 var symptomsBtn = symptomsCell.find("button.symptoms-btn");
                 var selectedSymptoms = getSelectedSymptoms();
                 var symptoms = selectedSymptoms.join(',');
+                var pictureCell = row.find("td:eq(4)");
+                var pictureInput = row.find("td:eq(4) input.picture-input");
+
+                var file = pictureInput[0].files[0];
+                var picture = file ? file.name : ""; // Get the file name or set it to an empty string if no file selected
 
                 descriptionBtn.replaceWith(description);
                 treatmentBtn.replaceWith(treatment);
                 symptomsBtn.replaceWith(symptoms);
+                pictureCell.text(picture); // Set the text content of the picture cell to the file name
+
                 $("#symptomsModal .symptom-checkbox").prop('checked', false);
+
                 $("#descriptionModal input").val('');
                 $("#descriptionModal textarea").val('');
                 $("#treatmentModal input").val('');
                 $("#treatmentModal textarea").val('');
 
+                var diseaseInput = row.find("td:eq(0) input");
+                var disease = diseaseInput.val();
+                diseaseInput.replaceWith(disease);
 
-
-                var row = $(this).closest("tr");
-                var disease = row.find("td:eq(0) input").val();
-
-                row.find("td:eq(0)").text(disease);
+                // Reset the picture input value
+                pictureInput.val('');
 
 
                 $.post('/add_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {

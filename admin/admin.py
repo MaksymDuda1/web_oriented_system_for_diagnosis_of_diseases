@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template,request,jsonify
-from db.db import     delete_from_disease_symptom,update_disease_symptom ,do_disease_delete,insert_into_diseases,insert_into_diseases_symptoms,get_disease_id,get_symptom_id, do_disease_update,do_symptom_update,get_symptom,do_symptom_delete,insert_symptom_data,get_symptoms,show_users,do_user_update_admin,do_user_delete,insertData,get_email,show_diseases,users_count,show_symptoms, most_popular_disease,diagnosis_count,last_diagnose
-#do_disease_update_admin
+from flask import Blueprint, render_template,request,jsonify,current_app
+from db.db import save_disease_picture,delete_from_disease_symptom,update_disease_symptom ,do_disease_delete,insert_into_diseases,insert_into_diseases_symptoms,get_disease_id,get_symptom_id, do_disease_update,do_symptom_update,get_symptom,do_symptom_delete,insert_symptom_data,get_symptoms,show_users,do_user_update_admin,do_user_delete,insertData,get_email,show_diseases,users_count,show_symptoms, most_popular_disease,diagnosis_count,last_diagnose
+from werkzeug.utils import secure_filename
+import os
 
 
 admin = Blueprint('admin', __name__,template_folder='templates')
@@ -62,18 +63,30 @@ def do_diseases():
 @admin.route('/add_diseases', methods=['POST'])
 def  add_disease():
     if request.method == "POST":
-        name = request.form['disease']
-        description = request.form['description']
-        treatment = request.form['treatment']
+        disease = request.form['disease']
         msg = "Disease successfully added"
         geter = request.form['symptoms']
         symptoms = geter.split(",")
         insert_into_diseases(request)
-        disease_id = get_disease_id(name)
+        disease_id = get_disease_id(disease)
         for word in symptoms:
             symptom_id = get_symptom_id(word)
             insert_into_diseases_symptoms(disease_id, symptom_id)
     return msg
+
+@admin.route('/update_diseases_picture', methods=['POST'])
+def update_disease_picture():
+    name = request.form['disease']
+    disease_id = get_disease_id(name)
+    if request.method == "POST":
+        file = request.files['avatar']
+        filename = secure_filename(file.filename)
+        if filename:
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            return save_disease_picture(filename, disease_id)
+    return "Error: Invalid request"
+
 @admin.route('/update_diseases' ,methods=['POST'])
 def update_disease():
     if request.method == 'POST':
