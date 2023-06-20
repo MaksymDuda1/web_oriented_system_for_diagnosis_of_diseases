@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template,request,jsonify
-from db.db import do_symptom_update,get_symptom,do_symptom_delete,insert_symptom_data,get_symptoms,show_users,do_user_update_admin,do_user_delete,insertData,get_email,show_diseases,users_count,show_symptoms, most_popular_disease,diagnosis_count,last_diagnose
+from db.db import update_disease_symptom ,do_disease_delete,insert_into_diseases,insert_into_diseases_symptoms,get_disease_id,get_symptom_id, do_disease_update,do_symptom_update,get_symptom,do_symptom_delete,insert_symptom_data,get_symptoms,show_users,do_user_update_admin,do_user_delete,insertData,get_email,show_diseases,users_count,show_symptoms, most_popular_disease,diagnosis_count,last_diagnose
 #do_disease_update_admin
 
 
@@ -59,6 +59,48 @@ def do_diseases():
      return render_template('admin/diseases_page.html',diseases = diseases,symptoms = symptoms)
 
 
+@admin.route('/add_diseases', methods=['POST'])
+def  add_disease():
+    if request.method == "POST":
+        name = request.form['disease']
+        description = request.form['description']
+        treatment = request.form['treatment']
+        msg = "Disease successfully added"
+        geter = request.form['symptoms']
+        symptoms = geter.split(",")
+        insert_into_diseases(request)
+        disease_id = get_disease_id(name)
+        for word in symptoms:
+            symptom_id = get_symptom_id(word)
+            insert_into_diseases_symptoms(disease_id, symptom_id)
+    return msg
+@admin.route('/update_diseases' ,methods=['POST'])
+def update_disease():
+    if request.method == 'POST':
+        name = request.form['disease']
+        description = request.form['description']
+        treatment = request.form['treatment']
+        msg = do_disease_update(name,description,treatment)
+        geter = request.form['symptoms']
+        symptoms = geter.split(",")
+        for word in symptoms:
+            symptom_id = get_symptom_id(word)
+            disease_id = get_disease_id(name)
+            update_disease_symptom(disease_id,symptom_id)
+    return msg
+
+@admin.route('/delete_diseases', methods=['POST'])
+def  delete_disease():
+    if request.method == "POST":
+        name = request.form['disease']
+        msg = do_disease_delete(name)
+    return msg
+
+
+
+
+
+
 @admin.route('/symptoms')
 def do_symptoms():
     symptoms = show_symptoms()
@@ -101,15 +143,4 @@ def update_symptom():
         msg = 'Record successfully Updated'
     return jsonify(msg)
 
-
- # @admin.route('/update_diseases')
- # def update_disease():
- #     if request.method == "POST":
- #         disease = request.form['disease']
- #         description = request.form['description']
- #         treatment = request.form['treatment']
- #         symptoms = request.form['symptoms']
- #         multiplier = request.form['multiplier']
- #         msg = do_disease_update_admin(disease, description, treatment, symptoms, multiplier)
- #     return jsonify(msg)
 

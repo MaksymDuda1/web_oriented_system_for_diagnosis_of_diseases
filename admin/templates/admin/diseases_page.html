@@ -214,20 +214,14 @@
 
             var row = $(this).closest("tr");
             var disease = row.find("td:eq(0) input").val();
-            var description = row.find("td:eq(1) input").val();
-            var treatment = row.find("td:eq(2) input").val();
-            var symptoms = row.find("td:eq(3) input").val();
 
             row.find("td:eq(0)").text(disease);
-            row.find("td:eq(1)").text(description);
-            row.find("td:eq(2)").text(treatment);
-            row.find("td:eq(3)").text(symptoms);
 
             $.post('/update_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {
-                $("#displaymessage").html(data);
-                $("#displaymessage").show();
-                if (data === "Update successful") {
-                    // Perform any necessary actions after successful update
+
+                if (data === "Updated successfully") {
+                    $("#displaymessage").html(data);
+                    $("#displaymessage").show();
                 }
             });
 
@@ -239,10 +233,10 @@
             var disease = row.find("td:eq(0)").text();
             // Perform delete operation using disease value
 
-            $.post('/delete', { disease: disease }, function (data) {
+            $.post('/delete_diseases', { disease: disease }, function (data) {
                 $("#displaymessage").html(data);
                 $("#displaymessage").show();
-                if (data === "Delete successfully") {
+                if (data === "Deleted successfully") {
                     row.remove();
                 }
             });
@@ -304,23 +298,15 @@
                 $("#treatmentModal input").val('');
                 $("#treatmentModal textarea").val('');
 
-                var diseaseInput = newRow.querySelector(".disease-input");
-                var descriptionInput = newRow.querySelector(".description-input");
-                var treatmentInput = newRow.querySelector(".treatment-input");
-                var symptomsInput = newRow.querySelector(".symptoms-input");
-                var disease = diseaseInput.value;
-                var description = descriptionInput.value;
-                var treatment = treatmentInput.value;
-                var symptoms = symptomsInput.value;
 
-                var row = this.closest("tr");
+
+                var row = $(this).closest("tr");
+                var disease = row.find("td:eq(0) input").val();
+
                 row.find("td:eq(0)").text(disease);
-                row.find("td:eq(1)").text(description);
-                row.find("td:eq(2)").text(treatment);
-                row.find("td:eq(3)").text(symptoms);
 
 
-                $.post('/add_disease', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {
+                $.post('/add_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {
                     if (data === "Disease already exists") {
                         $("#displaymessage").html(data);
                         $("#displaymessage").show();
@@ -328,7 +314,6 @@
                     } else {
                         $("#displaymessage").html(data);
                         $("#displaymessage").show();
-                        deleteRow(newRow);
                     }
                 }).fail(function () {
                     // Handle error cases for the AJAX request
