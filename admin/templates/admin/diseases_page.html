@@ -308,6 +308,7 @@
             <td><button class="btn btn-info treatment-btn" data-toggle="modal" data-target="#treatmentModal">Open Modal</button></td>
             <td><button class="btn btn-info symptoms-btn" data-toggle="modal" data-target="#symptomsModal">Open Modal</button></td>
             <td><input type="file" class="form-control picture-input" accept="image/*"></td>
+
             <td>
                 <a class="add" title="add" data-toggle="tooltip"><i class="fa fa-user-plus"></i></a>
                 <a class="save" title="save" data-toggle="tooltip"><i class="fa fa-save"></i></a>
@@ -331,11 +332,11 @@
             });
 
             // Change the edit button to the save button
-            $(document).on("click", ".save", function () {
+            $(newRow).find(".save").on("click", function () {
                 var row = $(this).closest("tr");
                 var descriptionCell = row.find("td:eq(1)");
                 var descriptionBtn = descriptionCell.find("button.description-btn");
-                var description = $("#diseaseDescription").val();
+                var description = $("#diseaseDescription").val(); // Get the value from the text area
                 var treatmentCell = row.find("td:eq(2)");
                 var treatmentBtn = treatmentCell.find("button.treatment-btn");
                 var treatment = $("#diseaseTreatment").val();
@@ -347,26 +348,26 @@
                 var pictureInput = row.find("td:eq(4) input.picture-input");
 
                 var file = pictureInput[0].files[0];
-                var picture = file ? file.name : ""; // Get the file name or set it to an empty string if no file selected
+                var picture = file ? file.name : "";
+                pictureCell.text(picture); // Set the text content of the picture cell to the file name
+
+                pictureInput.val('');
 
                 descriptionBtn.replaceWith(description);
                 treatmentBtn.replaceWith(treatment);
                 symptomsBtn.replaceWith(symptoms);
-                pictureCell.text(picture); // Set the text content of the picture cell to the file name
-
                 $("#symptomsModal .symptom-checkbox").prop('checked', false);
-
                 $("#descriptionModal input").val('');
                 $("#descriptionModal textarea").val('');
                 $("#treatmentModal input").val('');
                 $("#treatmentModal textarea").val('');
 
-                var diseaseInput = row.find("td:eq(0) input");
-                var disease = diseaseInput.val();
-                diseaseInput.replaceWith(disease);
 
-                // Reset the picture input value
-                pictureInput.val('');
+
+                var row = $(this).closest("tr");
+                var disease = row.find("td:eq(0) input").val();
+
+                row.find("td:eq(0)").text(disease);
 
 
                 $.post('/add_diseases', { disease: disease, description: description, treatment: treatment, symptoms: symptoms }, function (data) {

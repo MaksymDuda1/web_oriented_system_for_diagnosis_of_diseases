@@ -65,13 +65,14 @@ def  add_disease():
     if request.method == "POST":
         disease = request.form['disease']
         msg = "Disease successfully added"
-        geter = request.form['symptoms']
-        symptoms = geter.split(",")
+        getter = request.form['symptoms']
+        symptoms = getter.split(",")
         insert_into_diseases(request)
         disease_id = get_disease_id(disease)
         for word in symptoms:
             symptom_id = get_symptom_id(word)
             insert_into_diseases_symptoms(disease_id, symptom_id)
+
     return msg
 
 @admin.route('/update_diseases_picture', methods=['POST'])
