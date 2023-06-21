@@ -11,6 +11,7 @@ def registration_checker(req):
     if not is_used:
         file = req.files['user-photo']
         email = req.form['email']
+        session['email'] = req.form['email']
         session['password'] = req.form['password']
         filename = secure_filename(file.filename)
         if filename:

@@ -297,6 +297,7 @@ def do_user_update_user(req):
     user_id = ''.join(str(id) for id in session['user_id'])
     name = req.form['name']
     email = req.form['email']
+    session['email'] = email
     birthday = req.form['birthday']
     gender = req.form['gender']
     password = req.form['password']
@@ -309,11 +310,9 @@ def do_user_update_user(req):
         WHERE user_id = %s
         """
         cursor.execute(_SQL, (name, email, birthday, gender, hashed_password, user_id))  # Convert to tuple
+        success_msg = 'Record successfully updated'
 
-        msg = 'Record successfully updated'
-
-    return msg
-
+    return {'msg': success_msg}
 
 
 def do_user_disease_delete(email):

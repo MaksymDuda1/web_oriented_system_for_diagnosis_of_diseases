@@ -20,16 +20,17 @@ def show_main_page():
 def do_users():
     users = show_users()
     return render_template('admin/users_page.html', users=users)
-@admin.route('/update_users', methods=['POST'])
-def update_user():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        birthday = request.form['birthday']
-        gender = request.form['gender']
-        role = request.form['role']
-        msg = do_user_update_admin(name,email,birthday,gender,role)
-    return jsonify(msg)
+@admin.route('/add_users', methods=['POST'])
+def add_user():
+    if request.method == "POST":
+        if get_email(request):
+            msg = "Email already exists"
+            return jsonify(msg)
+        else:
+            data = insertData(request, None)
+            if data:
+                msg = "User added successfully"
+                return jsonify(msg)
 
 @admin.route('/delete_users',methods =['POST'])
 def delete_user():
@@ -39,18 +40,7 @@ def delete_user():
 
         return msg
 
-@admin.route('/add_users', methods=['POST'])
-def add_user():
-    if request.method == "POST":
-        result = get_email(request)
-        if result:
-            msg = "Email already exists"
-            return jsonify(msg)
-        else:
-            data = insertData(request, None)
-            if data:
-                msg = "User added successfully"
-                return jsonify(msg)
+
 
 
 @admin.route('/diseases')
