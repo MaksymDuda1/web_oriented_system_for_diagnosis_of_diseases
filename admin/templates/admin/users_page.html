@@ -213,10 +213,12 @@
                     } else {
                         $("#displaymessage").html(data);
                         $("#displaymessage").show();
+                        $(this).removeClass("save").addClass("edit").attr("title", "Edit").find("i").removeClass("fa-save").addClass("fa-pencil");
+
                         // Видалити рядок, якщо електронна адреса вже існує
-                        deleteRow(newRow);
-                        return;
+
                     }
+
                 });
 
                 // Видалити рядок після збереження

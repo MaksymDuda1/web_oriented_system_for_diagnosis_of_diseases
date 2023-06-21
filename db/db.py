@@ -70,14 +70,15 @@ def get_diagnose(symptoms):
                    JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
                    JOIN symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
                    WHERE symptoms.name IN ({})""".format(placeholders)
-        cursor.execute(query, tuple(symptoms))
-        row = cursor.fetchone()
+        cursor.execute(query, list(symptoms))  # Convert tuple to list
+        row = cursor.fetchall()
         if row:
-            results, disease_id = row[0], row[1]
+            results, disease_id = row[0][0], row[0][1]
         else:
             results, disease_id = None, None
 
     return results, disease_id
+
 
 
 def get_desc(disease):

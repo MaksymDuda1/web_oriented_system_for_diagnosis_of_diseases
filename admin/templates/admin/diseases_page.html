@@ -159,7 +159,6 @@
                 $("#symptomsModal").modal('hide');
             });
         });
-
         $(document).on("change", ".picture-input", function () {
             var row = $(this).closest("tr");
             var pictureCell = row.find("td:eq(4)");
@@ -317,6 +316,7 @@
                 <a class="delete" title="delete" data-toggle="tooltip"><i class="fa fa-trash-o"></i></a>
             </td>`;
 
+
             $(document).on("click", ".save-description", function () {
                 // Close the modal window
                 $("#descriptionModal").modal("hide");
@@ -333,8 +333,10 @@
 
             });
 
-            // Change the edit button to the save button
-            $(newRow).find(".save").on("click", function () {
+            // Зміна кнопки редагування на кнопку збереження
+            var editBtn = newRow.querySelector(".save");
+            editBtn.addEventListener("click", function () {
+                // Додайте код для збереження даних з нового рядка
                 var row = $(this).closest("tr");
                 var descriptionCell = row.find("td:eq(1)");
                 var descriptionBtn = descriptionCell.find("button.description-btn");
@@ -367,6 +369,9 @@
 
 
                 var row = $(this).closest("tr");
+                this.querySelector("i").classList.remove("fa-save");
+                this.querySelector("i").classList.add("fa-pencil");
+
                 var disease = row.find("td:eq(0) input").val();
 
                 row.find("td:eq(0)").text(disease);
@@ -381,15 +386,16 @@
                         $("#displaymessage").html(data);
                         $("#displaymessage").show();
                     }
+
                 }).fail(function () {
                     // Handle error cases for the AJAX request
                     console.error("An error occurred during the POST request.");
                 });
-
-                row.find(".delete").on("click", function () {
+                row.querySelector(".delete").addEventListener("click", function () {
                     row.remove();
                 });
             });
+
 
             // Get the table and add the new row
             var tableBody = document.querySelector("tbody");
