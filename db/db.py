@@ -61,41 +61,34 @@ def get_login_data(req):
         return None, None, None,None
 
 
-
 def get_diagnose(symptoms):
-    diseases = show_diseases()
-    max_score = 0
-    max_disease = None
-    max_disease_id = None
+    diseases = show_diseases()  # Assuming this function returns a list of diseases
+    results = {}
 
-    with UseDatabase(current_app.config['dbconfig']) as cursor:
-        for disease in diseases:
-            disease_name = disease['name']
-            total_score = 0
+    for disease in diseases:
+        disease_name = disease['name']
 
-            for symptom in symptoms:
-                query = """
-                    SELECT diseases.name, diseases.disease_id, SUM(COALESCE(symptoms.multiplier, 0)) AS total_score
-                    FROM diseases
-                    JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
-                    JOIN symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
-                    WHERE diseases.name = %s AND symptoms.name = %s
-                    GROUP BY diseases.name, diseases.disease_id
-                """
-                cursor.execute(query, (disease_name, symptom))
-                row = cursor.fetchone()
+        with UseDatabase(current_app.config['dbconfig']) as cursor:
+            _SQL = """SELECT symptoms.name, symptoms.multiplier
+                      FROM symptoms
+                      JOIN diseases_symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
+                      JOIN diseases ON diseases_symptoms.disease_id = diseases.disease_id
+                      WHERE diseases.name = %s"""
+            cursor.execute(_SQL, (disease_name,))
+            disease_symptoms = cursor.fetchall()
 
-                if row is not None:
-                    score = row[2] if row[2] is not None else 0
-                    total_score += score
+        matched_symptoms = set(symptoms).intersection(symptom[0] for symptom in disease_symptoms)
+        coefficient = sum(symptom[1] for symptom in disease_symptoms if symptom[0] in matched_symptoms)
 
-            if total_score > max_score:
-                max_score = total_score
-                max_disease = disease_name
-                max_disease_id = get_disease_id(max_disease)
+        results[disease_name] = coefficient
 
-    return max_disease, max_disease_id, max_score
+    # Find the disease with the highest coefficient
+    max_coefficient = max(results.values())
+    diagnosis = [disease for disease, coefficient in results.items() if coefficient == max_coefficient]
+    qwe= ''.join(str(name) for name in diagnosis)
+    id = get_disease_id(qwe)
 
+    return qwe,id
 
 
 def get_desc(disease):
