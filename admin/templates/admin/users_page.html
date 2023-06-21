@@ -201,7 +201,7 @@
 
                 // Виконати перевірку електронної адреси на сервері перед збереженням
 
-                //
+
                 // Відправити дані на сервер для збереження
                 $.post('/add_users', { name: name, email: email, gender: gender, birthday: birthday, password: password, role: role }, function (data) {
                     if (data === "Email already exists") {

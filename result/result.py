@@ -6,9 +6,6 @@ import json
 result = Blueprint('result',__name__,template_folder='templates',static_folder='static')
 
 
-
-
-
 @result.route('/result', methods=['GET', 'POST'])
 @check__logged_in
 def show_result():
@@ -16,7 +13,7 @@ def show_result():
         symptoms = request.form.getlist('symptoms_input')
         symptoms_json = json.loads(symptoms[0])
         symptoms = [symptoms_json[0]]
-        diagnosis_result, disease_id = get_diagnose(symptoms)
+        diagnosis_result, disease_id,score = get_diagnose(symptoms)
         if diagnosis_result:
             filename = get_disease_filename(diagnosis_result)
             user_id = ''.join(str(id) for id in session['user_id'])
@@ -30,9 +27,10 @@ def show_result():
         else:
             msg = 'Disease not found, try again'
             return render_template('diagnosis/diagnosis.html', data=msg)
-    
+
     # Handle GET requests or other cases where the condition is not met
     return render_template('result/result.html')  # Provide an appropriate response
+
 
 
 

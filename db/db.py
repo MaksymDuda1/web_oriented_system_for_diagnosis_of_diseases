@@ -63,21 +63,38 @@ def get_login_data(req):
 
 
 def get_diagnose(symptoms):
-    with UseDatabase(current_app.config['dbconfig']) as cursor:
-        placeholders = ', '.join(['%s'] * len(symptoms))
-        query = """SELECT diseases.name, diseases.disease_id
-                   FROM diseases
-                   JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
-                   JOIN symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
-                   WHERE symptoms.name IN ({})""".format(placeholders)
-        cursor.execute(query, list(symptoms))  # Convert tuple to list
-        row = cursor.fetchall()
-        if row:
-            results, disease_id = row[0][0], row[0][1]
-        else:
-            results, disease_id = None, None
+    diseases = show_diseases()
+    max_score = 0
+    max_disease = None
+    max_disease_id = None
 
-    return results, disease_id
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        for disease in diseases:
+            disease_name = disease['name']
+            total_score = 0
+
+            for symptom in symptoms:
+                query = """
+                    SELECT diseases.name, diseases.disease_id, SUM(COALESCE(symptoms.multiplier, 0)) AS total_score
+                    FROM diseases
+                    JOIN diseases_symptoms ON diseases.disease_id = diseases_symptoms.disease_id
+                    JOIN symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
+                    WHERE diseases.name = %s AND symptoms.name = %s
+                    GROUP BY diseases.name, diseases.disease_id
+                """
+                cursor.execute(query, (disease_name, symptom))
+                row = cursor.fetchone()
+
+                if row is not None:
+                    score = row[2] if row[2] is not None else 0
+                    total_score += score
+
+            if total_score > max_score:
+                max_score = total_score
+                max_disease = disease_name
+                max_disease_id = get_disease_id(max_disease)
+
+    return max_disease, max_disease_id, max_score
 
 
 
