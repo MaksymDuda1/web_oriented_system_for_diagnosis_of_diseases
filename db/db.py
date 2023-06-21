@@ -63,12 +63,15 @@ def get_login_data(req):
 
 def get_diagnose(symptoms):
     diseases = show_diseases()  # Assuming this function returns a list of diseases
+
+    if not diseases:
+        return None, None
+
     results = {}
 
-    for disease in diseases:
-        disease_name = disease['name']
-
-        with UseDatabase(current_app.config['dbconfig']) as cursor:
+    with UseDatabase(current_app.config['dbconfig']) as cursor:
+        for disease in diseases:
+            disease_name = disease['name']
             _SQL = """SELECT symptoms.name, symptoms.multiplier
                       FROM symptoms
                       JOIN diseases_symptoms ON symptoms.symptom_id = diseases_symptoms.symptom_id
@@ -77,18 +80,23 @@ def get_diagnose(symptoms):
             cursor.execute(_SQL, (disease_name,))
             disease_symptoms = cursor.fetchall()
 
-        matched_symptoms = set(symptoms).intersection(symptom[0] for symptom in disease_symptoms)
-        coefficient = sum(symptom[1] for symptom in disease_symptoms if symptom[0] in matched_symptoms)
+            matched_symptoms = set(symptoms).intersection(symptom[0] for symptom in disease_symptoms)
+            if not matched_symptoms:
+                continue
 
-        results[disease_name] = coefficient
+            coefficient = sum(symptom[1] for symptom in disease_symptoms if symptom[0] in matched_symptoms)
+            results[disease_name] = coefficient
 
     # Find the disease with the highest coefficient
+    if not results:
+        return None, None
+
     max_coefficient = max(results.values())
     diagnosis = [disease for disease, coefficient in results.items() if coefficient == max_coefficient]
-    qwe= ''.join(str(name) for name in diagnosis)
+    qwe = ''.join(str(name) for name in diagnosis)
     id = get_disease_id(qwe)
 
-    return qwe,id
+    return qwe, id
 
 
 def get_desc(disease):

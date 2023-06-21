@@ -24,13 +24,12 @@ def show_result():
             treatment = treatment.replace("'", "").replace("(", "").replace(")", "").replace('"', "")
             return render_template('result/result.html', the_result=diagnosis_result, the_description=description,
                                    the_treatment=treatment, the_picture=filename)
+        else:
+            msg = 'Disease not found, try again'
+            return render_template('diagnosis/diagnosis.html', data=msg)
     else:
-        msg = 'Disease not found, try again'
-        return render_template('diagnosis/diagnosis.html', data=msg)
-
-
-    # Handle GET requests or other cases where the condition is not met
-
+        msg = 'Invalid request method'
+        return render_template('error.html', message=msg)
 
     return render_template('result/result.html')  # Provide an appropriate response
 
