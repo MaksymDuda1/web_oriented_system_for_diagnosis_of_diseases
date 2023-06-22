@@ -53,6 +53,11 @@
     </div>
 </div>
 <script>
+    function validateBirthday(birthday) {
+        // Використовуйте відповідний регулярний вираз для перевірки формату дати народження
+        var regex = /^\d{4}-\d{2}-\d{2}$/;
+        return regex.test(birthday)
+    }
     $(document).on("click", ".edit", function () {
         var row = $(this).closest("tr");
         var name = row.find("td:eq(0)").text();
@@ -192,6 +197,31 @@
                 var gender = genderInput.value;
                 var password = passwordInput.value;
                 var role = roleInput.value;
+                var isValidEmail = validateEmail(email);
+                var isValidBirthday = validateBirthday(birthday);
+                if (!isValidEmail) {
+                    $("#displaymessage").html("Wrong email");
+                    $("#displaymessage").show()
+                    setTimeout(function () {
+                        $("#displaymessage").hide();
+                        location.reload();
+
+                    }, 3000); // 5000 мілісекунд = 5 секунд
+
+                    return; // Перервати збереження, якщо email недійсний
+                }
+
+                if (!isValidBirthday) {
+                    $("#displaymessage").html("Wrong date of birth");
+                    $("#displaymessage").show()
+                    setTimeout(function () {
+                        $("#displaymessage").hide();
+                        location.reload();
+
+                    }, 3000); // 5000 мілісекунд = 5 секунд
+
+
+                }
 
                 // Виконати дії для збереження даних
                 var row = this.closest("tr");
